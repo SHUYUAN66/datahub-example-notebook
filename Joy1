@@ -8,7 +8,7 @@
 
 # scipy/machine learning (tensorflow)
 # https://hub.docker.com/repository/docker/ucsdets/scipy-ml-notebook/tags
-ARG BASE_CONTAINER=ucsdets/scipy-ml-notebook:2020.2-stable
+ARG BASE_CONTAINER=ucsdets/scipy-ml-notebook:latest
 
 FROM $BASE_CONTAINER
 
@@ -17,6 +17,8 @@ LABEL maintainer="UC San Diego ITS/ETS <ets-consult@ucsd.edu>"
 
 # 2) change to root to install packages
 USER root
+
+Run pip install tensorflow --upgrade --force-reinstall
 
 
 
