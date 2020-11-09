@@ -10,15 +10,49 @@
 # https://hub.docker.com/repository/docker/ucsdets/scipy-ml-notebook/tags
 ARG BASE_CONTAINER=ucsdets/scipy-ml-notebook:latest
 
+
+FROM ubuntu:14.04
+# MAINTAINER Regan <http://stackoverflow.com/questions/25185405/using-gpu-from-a-docker-container>
+RUN apt-get update && apt-get install -y build-essential
+RUN apt-get --purge remove -y nvidia*
+ADD ./Downloads/nvidia_installers /tmp/nvidia
+RUN /tmp/nvidia/NVIDIA-Linux-x86_64-331.62.run -s -N --no-kernel-module   > Install the driver.
+RUN rm -rf /tmp/selfgz7
+RUN /tmp/nvidia/cuda-linux64-rel-6.0.37-18176142.run -noprompt
+RUN /tmp/nvidia/cuda-samples-linux-6.0.37-18176142.run -noprompt -cudaprefix=/usr/local/cuda-6.0
+RUN export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64  
+RUN touch /etc/ld.so.conf.d/cuda.conf 
+RUN rm -rf /temp/* 
+
+
+ENV NVIDIA_VISIBLE_DEVICES all
+ENV NVIDIA_DRIVER_CAPABILITIES compute,utility
+
 FROM $BASE_CONTAINER
 
 
 LABEL maintainer="UC San Diego ITS/ETS <ets-consult@ucsd.edu>"
-
-# 2) change to root to install packages
 USER root
 
-Run pip install tensorflow --upgrade --force-reinstall
+
+
+#RUN ldconfig /usr/local/cuda/targets/x86_64-linux/lib/stubs && \
+    #HOROVOD_GPU_OPERATIONS=NCCL HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 HOROVOD_WITH_MXNET=1 \
+    #     pip install --no-cache-dir horovod && \
+    #ldconfig
+#lspci | grep -i nvidia
+#RUN --gpus all --rm nvidia/cuda nvidia-smi
+
+#RUN --rm --runtime=nvidia -e NVIDIA_VISIBLE_DEVICES=all nvidia/cuda nvidia-smi
+
+#RUN --rm --gpus 2 nvidia/cuda nvidia-smi
+
+#RUN --gpus '"device=1,2"' nvidia/cuda nvidia-smi --query-gpu=uuid --format-csv
+
+
+
+# 3) change to root to install packages
+RUN pip install tensorflow --upgrade --force-reinstall
 
 
 
