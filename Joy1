@@ -3,7 +3,7 @@ ARG BASE_CONTAINER=ucsdets/scipy-ml-notebook:latest
 FROM $BASE_CONTAINER
 
 
-LABEL maintainer= shw276@icloud.com
+
 USER rooter
 USER anthea-mac
 
