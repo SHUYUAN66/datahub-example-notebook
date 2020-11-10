@@ -1,28 +1,18 @@
-# 1) choose base container
-# generally use the most recent tag
 
-# data science notebook
-# https://hub.docker.com/repository/docker/ucsdets/datascience-notebook/tags
-#ARG BASE_CONTAINER=ucsdets/rl-notebook:latest
-
-
-# scipy/machine learning (tensorflow)
-# https://hub.docker.com/repository/docker/ucsdets/scipy-ml-notebook/tags
 ARG BASE_CONTAINER=ucsdets/scipy-ml-notebook:latest
 FROM $BASE_CONTAINER
 
 
-LABEL maintainer="UC San Diego ITS/ETS <ets-consult@ucsd.edu>"
-USER root
+LABEL maintainer= shw276@icloud.com
+USER rooter
+USER anthea-mac
+
+RUN	apt-get install htop
+
+# 3) install packages
+RUN pip install --no-cache-dir networkx scipy python-louvain
 
 
-# FROM ubuntu:14.04
-RUN shw276 -ms /bin/bash shw276
-USER shw276
-WORKDIR /home/shw276
-
-ENV NVIDIA_VISIBLE_DEVICES all
-ENV NVIDIA_DRIVER_CAPABILITIES graphics,utility,compute
 # Add gym.
 RUN pip install --upgrade pip \
   && pip install gym==0.17.2 box2d==2.3.1
@@ -30,31 +20,11 @@ RUN pip install --upgrade pip \
 
 
 
-#RUN ldconfig /usr/local/cuda/targets/x86_64-linux/lib/stubs && \
-    #HOROVOD_GPU_OPERATIONS=NCCL HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 HOROVOD_WITH_MXNET=1 \
-    #     pip install --no-cache-dir horovod && \
-    #ldconfig
-#lspci | grep -i nvidia
-#RUN --gpus all --rm nvidia/cuda nvidia-smi
-
-#RUN --rm --runtime=nvidia -e NVIDIA_VISIBLE_DEVICES=all nvidia/cuda nvidia-smi
-
-#RUN --rm --gpus 2 nvidia/cuda nvidia-smi
-
-#RUN --gpus '"device=1,2"' nvidia/cuda nvidia-smi --query-gpu=uuid --format-csv
-
-
 
 # 3) change to root to install packages
 RUN pip install tensorflow --upgrade --force-reinstall
+RUN pip install tensorflow-gpu --upgrade --force-reinstall
 
-
-
-# Run -it --rm --gpus device=GPU-3a23c669-1f69-c64e-cf85-44e9b07e7a2a ubuntu nvidia-smi
-# Run apt-get install nvidia-container-runtime
-# RUN apt-get install nvidia-driver-390
-
-# RUN pip install --upgrade tensorflow-gpu==2.2.0
 
 RUN apt-get install -y aria2
 
@@ -67,5 +37,7 @@ RUN pip install --no-cache-dir geopandas babypandas
 
 # 4) change back to notebook user
 COPY /run_jupyter.sh /
-RUN chmod 755 /run_jupyter.sh
+RUN run_jupyter.sh
+
+USER $NB_UID
 USER $NB_UID
